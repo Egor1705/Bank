@@ -1,5 +1,3 @@
-package main;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -7,36 +5,42 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-import impl.Transaction;
-
 public class Main {
 
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
-		Scanner sc = new Scanner(System.in);
 
-		String driver = "com.mysql.cj.jdbc.Driver";
+		Scanner sc = new Scanner(System.in);
+		String user = "USER06A";
+		String password = "USER06A";
+		String databaseURL = "jdbc:db2://172.20.2.116:5035/DALLASB";
+	//	 String databaseURL="jdbc:db2://localhost:5035/DALLASB";
+		Connection conn = null;
+		Statement statement = null;
 		try {
-			Class.forName(driver);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Class.forName("com.ibm.db2.jcc.DB2Driver");
+			conn = DriverManager.getConnection(databaseURL, user, password);
+			if (conn != null) {
+				System.out.println("Connected to the database");
+			}
+		} catch (ClassNotFoundException ex) {
+			System.out.println("Could not find DB2 driver class");
+			ex.printStackTrace();
+
 		}
-		String url = "jdbc:mysql://localhost/Bank?useUnicode=" + "true&useJDBCCompliantTimezoneShift="
-				+ "true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-		Connection con = DriverManager.getConnection(url, "root", "Bottomass1375");
-		Statement st = con.createStatement();
+
+		statement = conn.createStatement();
 
 		boolean check = true;
-		
 		while (check) {
 			System.out.println("What are you going to do?\n" + "1)Open the bill\n" + "2)Close the bill\n"
 					+ "3)Put money on the bill\n" + "4)Take money from the bill\n" + "5)Show the sum\n"
+					+ "6)Show all bills\n"+"7)Show all transactions\n"
 					+ "0)Finish\n ");
-			String temp = sc.nextLine();
+			int temp = sc.nextInt();
 
 			switch (temp) {
-			case "1": {
+			case 1: {
 				System.out.println("Input the number of bill :\n ");
 				int bill = sc.nextInt();
 
@@ -44,93 +48,61 @@ public class Main {
 
 				break;
 			}
-			case "2": {
+			case 2: {
 				System.out.println("Input the number of bill :\n ");
 				int bill = sc.nextInt();
-Transaction.closeBill(bill);
+				Transaction.closeBill(bill);
 				break;
 			}
 
-			 case "3": {
-				 System.out.println("Input the number of bill :\n ");
-					int bill = sc.nextInt();
-				 System.out.println("Input sum which you want to put :\n");
-				int sum = sc.nextInt();
-			 Transaction.putMoney(bill, sum);
-			 break;
-			 }
-			
-			 case "4": {
-			
-				 System.out.println("Input the number of bill :\n ");
-					int bill = sc.nextInt();
-				 System.out.println("Input sum which you want to take :\n");
-				int sum = sc.nextInt();
-			 Transaction.takeMoney(bill, sum);
-				 
-				 
-			 break;
-			 }
-			
-			 case "5": {
-				 System.out.println("Input the number of bill :\n ");
+			case 3: {
+				System.out.println("Input the number of bill :\n ");
 				int bill = sc.nextInt();
-				 Transaction.showBill(bill);
-				 
-				 
-			 break;
-			 }
+				System.out.println("Input sum which you want to put :\n");
+				int sum = sc.nextInt();
+				Transaction.putMoney(bill, sum);
+				break;
+			}
+
+			case 4: {
+
+				System.out.println("Input the number of bill :\n ");
+				int bill = sc.nextInt();
+				System.out.println("Input sum which you want to take :\n");
+				int sum = sc.nextInt();
+				Transaction.takeMoney(bill, sum);
+
+				break;
+			}
+
+			case 5: {
+				System.out.println("Input the number of bill :\n ");
+				int bill = sc.nextInt();
+				Transaction.showBill(bill);
+
+				break;
+			}
+			
+			case 6:{
+				Transaction.showAllBills();
+				break;
+			}
+			
+			case 7:{
+				Transaction.showAllTransactions();
+				break;
+			}
 
 			default: {
 				System.out.println("exit");
 				check = false;
-				
+
 			}
 			}
 
 		}
-
 		
 
-		String sqlList = "SELECT * FROM BILL";
-
-		ResultSet resultSet = st.executeQuery(sqlList);
-
-		while (resultSet.next()) {
-			int bill_id = resultSet.getInt("id_bill");
-			String name = resultSet.getString("NAME");
-			String surName = resultSet.getString("SURNAME");
-			String status = resultSet.getString("STATUS_OF_bill");
-
-			System.out.println(" " + resultSet.getInt("id_bill") + ",\t " + resultSet.getString("NAME") + ",\t "
-					+ resultSet.getString("SURNAME") + ",\t " + resultSet.getString("STATUS_OF_bill") + ",\t ");
-
-		}
-		//
-		resultSet.close();
-		System.out.println("\n");
-		
-
-		 String sqlList1 = "SELECT * FROM TRANSACTION";
-		
-		 ResultSet resultSet1 = st.executeQuery(sqlList1);
-		
-		
-		
-		
-		 while (resultSet1.next()) {
-		 int id = resultSet1.getInt("id");
-		
-		int sum1 = resultSet1.getInt("sum");
-		int id_bill = resultSet1.getInt("id_transact_bill");
-		//
-		//
-		 System.out.println(" " + resultSet1.getInt("id") + ",\t "
-		 + resultSet1.getInt("sum")+",\t " +resultSet1.getInt("id_transact_bill") + ",\t " );
-		
-		 }
-		
-		 resultSet1.close();
 
 	}
 
